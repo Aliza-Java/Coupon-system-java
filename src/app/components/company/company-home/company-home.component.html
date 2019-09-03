@@ -1,0 +1,17 @@
+<div *ngIf="!companyService.errorMessage">
+
+    <h1>Welcome, {{companyService.currentCompany.name}}! </h1>
+
+
+    <h2>Account details:</h2>
+    Id: {{companyService.currentCompany.id}}
+    <br>
+    Password: {{companyService.currentCompany.password}}
+    <br>
+    Email: {{companyService.currentCompany.email}}
+
+    <h1>Today is: {{todayDate | date:'fullDate'}}</h1>
+
+</div>
+
+<h2 *ngIf="companyService.errorMessage">{{companyService.errorMessage}}</h2>
