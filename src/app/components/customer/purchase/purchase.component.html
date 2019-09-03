@@ -1,0 +1,37 @@
+
+<h2>Select the coupon you would like to purchase:</h2>
+
+
+<table border="1px">
+    <tr>
+        <th>Id</th>
+        <th>Title</th>
+        <th>StartDate</th>
+        <th>EndDate</th>
+        <th>Category</th>
+        <th>Message</th>
+        <th>Price</th>
+        <th>Image</th>
+    </tr>
+
+    <!-- A message will show if there are no coupons available for purchase. -->
+    <tr *ngIf="customerService.availableCoupons?.length == 0">
+        <td colspan="10" width="100%"><app-empty-list whatInWhere="coupons available for purchase."></app-empty-list></td>
+    </tr>
+
+    <tr *ngFor="let c of customerService.availableCoupons" (click)="customerService.purchase(c.id)">
+        <td>{{c.id}}</td>
+        <td>{{c.title}}</td>
+        <td>{{c.startDate}}</td>
+        <td>{{c.endDate}}</td>
+        <td>{{c.category}}</td>  
+        <td>{{c.message}}</td>
+        <td>{{c.price}}</td>
+        <!--for now saving images on client side.-->
+        <td><img width="70px" src="assets/images/{{c.image}}" /></td>
+    </tr>
+</table>
+
+<h2 *ngIf="customerService.resultMessage">{{customerService.resultMessage}}</h2>
+
+

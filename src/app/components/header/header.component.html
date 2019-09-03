@@ -1,0 +1,8 @@
+<div>
+    <h1>Coupon System Website</h1>
+    <div>
+        <a *ngIf="!loginService.isLoggedIn" routerLink="/login">Login</a>
+        <a *ngIf="loginService.isLoggedIn" href="javascript:void" (click)="logout()">Logout</a>
+    </div>
+
+</div>
