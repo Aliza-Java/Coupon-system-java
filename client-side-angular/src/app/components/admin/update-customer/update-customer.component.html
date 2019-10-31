@@ -1,0 +1,44 @@
+<h2>Select the customer you wish to update:</h2>
+
+<!--If there are no customers, empty list notice will appear instead of dropdown.-->
+
+<div *ngIf="adminService.allCustomers?.length == 0">
+    <app-empty-list whatInWhere="customers in the system."></app-empty-list>
+</div>
+
+<div *ngIf="adminService.allCustomers?.length > 0">
+    <select [(ngModel)]="customerId">
+        <option *ngFor="let c of adminService.allCustomers">{{c.id}}</option>
+    </select>
+    <br>
+
+    <!-- user cannot click button unless some customer id was chosen -->
+    <button [disabled]="!customerId" (click)="fillCustomerDetails()">Find this customer</button>
+</div>
+
+
+<form *ngIf="customerToUpdate" #formDetails="ngForm">
+    <table>
+        <tr>
+            <td>Id:</td>
+            <td>{{customerToUpdate.id}}</td>
+        </tr>
+
+        <tr>
+            <td>Name:</td>
+            <td>{{customerToUpdate.name}}</td>
+        </tr>
+
+        <tr>
+            <td>Password:</td>
+            <td><input required pattern="^.{4,}$" #passwordInfo="ngModel" name="password" type="password"
+                    [(ngModel)]="customerToUpdate.password" (keydown)="enableSubmit()" /></td>
+            <td><span *ngIf="passwordInfo.errors?.required&&passwordInfo.touched">Password required</span>
+                <span *ngIf="passwordInfo.errors?.pattern&&passwordInfo.touched">Password too short</span></td>
+        </tr>
+
+    </table>
+
+    <!-- Submit button is disabled unless form is completely valid and only if a change was made -->
+    <button [disabled]="formDetails.form.invalid || !wasChange" (click)="submitChanges()">Submit changes</button>
+</form>

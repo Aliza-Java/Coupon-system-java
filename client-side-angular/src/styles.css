@@ -1,0 +1,14 @@
+html, body{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.error{
+    color: red;
+    position: absolute;
+}
+
+#emptyListArea{
+width:250px;
+}
