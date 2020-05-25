@@ -22,8 +22,6 @@ import jbcourse.couponSystemPhase3.util_classes.User;
 
 @RestController
 @RequestMapping("sec/customer")
-//overcoming CORS while allowing cookies
-//@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", allowCredentials = "true")
 public class CustomerWebService {
 
 	@Autowired

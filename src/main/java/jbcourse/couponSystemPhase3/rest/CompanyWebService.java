@@ -27,8 +27,6 @@ import jbcourse.couponSystemPhase3.util_classes.User;
 
 @RestController
 @RequestMapping("sec/company")
-//overcoming CORS while allowing cookies
-//@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", allowCredentials = "true")
 public class CompanyWebService {
 
 	@Autowired
@@ -36,6 +34,7 @@ public class CompanyWebService {
 
 	@Autowired
 	HttpSession session;
+
 
 	@RequestMapping(path = "details/{companyId}")
 	public Company getCompanyDetails(@PathVariable long companyId) throws ObjectNotFoundException {
@@ -63,7 +62,6 @@ public class CompanyWebService {
 	@PutMapping(path = "updatecoupon/{couponId}")
 	public void updateCoupon(@PathVariable long couponId, @RequestBody Coupon coupon)
 			throws PermissionException, ObjectNotFoundException, CouponDateException {
-		System.out.println(coupon.getCompany());
 		coupon.setId(couponId);
 
 		companyService.updateCoupon(coupon, ((User) session.getAttribute("user")).getId());

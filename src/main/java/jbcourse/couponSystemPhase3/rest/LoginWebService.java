@@ -4,11 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import jbcourse.couponSystemPhase3.entities.Company;
@@ -23,10 +21,6 @@ import jbcourse.couponSystemPhase3.util_classes.LoginType;
 import jbcourse.couponSystemPhase3.util_classes.User;
 
 @RestController
-//Overcoming CORS while allowing cookies
-@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", allowCredentials = "true", 
-methods= {RequestMethod.DELETE, RequestMethod.GET, RequestMethod.HEAD, RequestMethod.OPTIONS, RequestMethod.PATCH, RequestMethod.POST, RequestMethod.PUT, RequestMethod.TRACE} )
-
 @RequestMapping("log") // path will continue with 'in' or 'out', depending on user's choice
 public class LoginWebService {
 

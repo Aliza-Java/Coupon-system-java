@@ -37,12 +37,4 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 	//used by CustomerServiceImpl to see available coupons
 	List<Coupon> findAllByOrderByIdAsc();
 	
-	
-	
-	                                                                                                                                                                 
-	
-
-	
-	
-
 }

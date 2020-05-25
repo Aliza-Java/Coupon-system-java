@@ -5,12 +5,15 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import jbcourse.couponSystemPhase3.entities.Company;
@@ -21,9 +24,6 @@ import jbcourse.couponSystemPhase3.services.AdminService;
 
 @RestController
 @RequestMapping("sec/admin")
-//For overcoming CORS while allowing cookies
-//@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", allowCredentials = "true") 
-
 public class AdminWebService {
 
 	@Autowired
@@ -32,6 +32,12 @@ public class AdminWebService {
 	@Autowired
 	HttpSession session;
 
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value = "/**", method = RequestMethod.OPTIONS)
+	public ResponseEntity handle() {
+	    return new ResponseEntity(HttpStatus.OK);
+	}
+	
 	@RequestMapping(path = "companies")
 	public List<Company> findAllCompanies() {
 		return adminService.getAllCompanies();
