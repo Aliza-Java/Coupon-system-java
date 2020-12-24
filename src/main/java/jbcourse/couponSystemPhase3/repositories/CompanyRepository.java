@@ -19,4 +19,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 	//Defined this method explicitly in order to sort by Id in ascending order
 	@Query
 	List<Company> findByOrderByIdAsc();
+
+	@Query
+	Optional<Company> findByName(String name);
 }

@@ -16,7 +16,7 @@ import jbcourse.couponSystemPhase3.util_classes.User;
  */
 
 
-@Aspect
+//@Aspect
 @Configuration
 public class PermissionAspect {
 	

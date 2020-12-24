@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import jbcourse.couponSystemPhase3.exceptions.IncompatibleInputException;
 import jbcourse.couponSystemPhase3.exceptions.ObjectNotFoundException;
 import jbcourse.couponSystemPhase3.services.AdminService;
 
+@CrossOrigin(origins = "${cors.origin}")
 @RestController
 @RequestMapping("sec/admin")
 public class AdminWebService {

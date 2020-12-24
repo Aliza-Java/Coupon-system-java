@@ -1,11 +1,15 @@
 package jbcourse.couponSystemPhase3.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -28,10 +32,10 @@ public class AdminServiceImpl implements AdminService {
 	CustomerRepository customerRepository;
 
 	@Value("${spring.datasource.username}")
-	private String savedUsername;
+	private String adminUsername;
 
 	@Value("${spring.datasource.password}")
-	private String savedPassword;
+	private String adminPassword;
 
 	final static long NO_ID = -1; // Can be used when comparing with an id that definitely does not exist in the
 									// database.
@@ -39,8 +43,18 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public boolean login(String username, String password) {
 
-		return savedUsername.equals(username) && savedPassword.equals(password) ? true : false;
+		return adminUsername.equals(username) && adminPassword.equals(password) ? true : false;
 
+	}
+
+	public UserDetails getAdminUserDetails(String username) throws UsernameNotFoundException {
+		if (adminUsername.equals(username)) {
+			//of course admin password is better encrypted.
+			return new User(adminUsername, adminPassword,
+					new ArrayList<>());
+		} else {
+			throw new UsernameNotFoundException("User not found with username: " + username);
+		}
 	}
 
 	@Override
@@ -72,7 +86,7 @@ public class AdminServiceImpl implements AdminService {
 			throws IncompatibleInputException, ObjectNotFoundException {
 		// company cannot be null, as this was validated through spring validation in
 		// the method signature.
-		List<Coupon> saveTheCoupons; //Will be used to save the coupons as these are not updated
+		List<Coupon> saveTheCoupons; // Will be used to save the coupons as these are not updated
 		try {
 			Company existingCompany = getCompanyById(companyId);
 			saveTheCoupons = existingCompany.getCoupons();
@@ -84,7 +98,7 @@ public class AdminServiceImpl implements AdminService {
 		} catch (ObjectNotFoundException e) {
 			throw new ObjectNotFoundException("Company", companyId);
 		}
-companyUpdatedInfo.setCoupons(saveTheCoupons);
+		companyUpdatedInfo.setCoupons(saveTheCoupons);
 		companyRepository.save(companyUpdatedInfo);
 
 	}

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import jbcourse.couponSystemPhase3.entities.Company;
 import jbcourse.couponSystemPhase3.entities.Customer;
 
 @Repository
@@ -20,4 +21,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>{
 	@Query
 	List<Customer> findByOrderByIdAsc();
 	
+	@Query
+	Optional<Customer> findByName(String name);
 }

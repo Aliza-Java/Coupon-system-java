@@ -50,6 +50,23 @@ public class CustomerServiceImpl implements CustomerService {
 		return optionalCustomer.get();
 	}// method
 
+//	public UserDetails getCustomerUserDetails(long customerId) throws ObjectNotFoundException {
+//		Customer customer = getCustomerById(customerId);
+//		if (customer != null) {
+//			return new User(customer.getName(), customer.getPassword(), new ArrayList<>());
+//		} else {
+//			throw new ObjectNotFoundException("Customer", customerId);
+//		}
+//	}
+
+	public Customer getCustomerByName(String name) {
+		Optional<Customer> optionalCustomer = customerRepository.findByName(name);
+		if (!optionalCustomer.isPresent()) {
+			return null;
+		}
+		return optionalCustomer.get();
+	}
+	
 	@Override
 	@Transactional
 	public ResponseEntity<String> purchaseCoupon(long couponId, long customerId)

@@ -6,6 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jbcourse.couponSystemPhase3.entities.Coupon;
 import jbcourse.couponSystemPhase3.entities.Customer;
@@ -19,6 +20,8 @@ public interface CustomerService {
 
 	public Customer getCustomerById(long id) throws ObjectNotFoundException;
 	
+	public Customer getCustomerByName(String name);
+	
 	public ResponseEntity<String> purchaseCoupon(long couponId, long customerId) throws ObjectNotFoundException, NoCouponsLeftException, CouponAlreadyPurchasedException;
 	
 	public List<Coupon> getAvailableCoupons(long customerId) throws ObjectNotFoundException;
@@ -30,5 +33,7 @@ public interface CustomerService {
 	public List<Coupon> getAllCouponsLessThanPrice(long customerId, double price) throws ObjectNotFoundException;
 
 	Customer login(@NotNull @NotBlank String username, @NotNull @NotBlank String password) throws LoginException;
+
+	//public UserDetails getCustomerUserDetails(long id) throws ObjectNotFoundException;
 	
 }

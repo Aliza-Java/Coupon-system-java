@@ -11,11 +11,16 @@ import jbcourse.couponSystemPhase3.exceptions.ObjectNotFoundException;
 @SpringBootApplication
 @ServletComponentScan
 @EnableAspectJAutoProxy
-public class CouponSystemPhase3Application {
 
+
+
+public class CouponSystemPhase3Application {
+	
 	public static void main(String[] args) throws ObjectNotFoundException {
 		SpringApplication.run(CouponSystemPhase3Application.class, args);
 
 	}
 	
+
+
 }

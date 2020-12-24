@@ -3,10 +3,11 @@ package jbcourse.couponSystemPhase3.rest;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import jbcourse.couponSystemPhase3.authentication.IAuthenticationFacade;
 import jbcourse.couponSystemPhase3.entities.Company;
 import jbcourse.couponSystemPhase3.entities.Coupon;
 import jbcourse.couponSystemPhase3.exceptions.CouponDateException;
@@ -23,8 +25,8 @@ import jbcourse.couponSystemPhase3.exceptions.ObjectNotFoundException;
 import jbcourse.couponSystemPhase3.exceptions.PermissionException;
 import jbcourse.couponSystemPhase3.services.CompanyService;
 import jbcourse.couponSystemPhase3.util_classes.CouponCategory;
-import jbcourse.couponSystemPhase3.util_classes.User;
 
+//@CrossOrigin(origins = "${cors.origin}")
 @RestController
 @RequestMapping("sec/company")
 public class CompanyWebService {
@@ -32,31 +34,47 @@ public class CompanyWebService {
 	@Autowired
 	CompanyService companyService;
 
+//	@Autowired
+//	HttpSession session;
+
 	@Autowired
-	HttpSession session;
+	IAuthenticationFacade authenticationFacade;
 
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value = "/**", method = RequestMethod.OPTIONS)
+	public ResponseEntity handle() {
+		return new ResponseEntity(HttpStatus.OK);
+	}
 
-	@RequestMapping(path = "details/{companyId}")
-	public Company getCompanyDetails(@PathVariable long companyId) throws ObjectNotFoundException {
+	// This method will be used throughout the controller to retrieve company id and
+	// use it in the calls to service.
+	private long currentCompanyId() {
+		Authentication authentication = authenticationFacade.getAuthentication();
+		return companyService.getCompanyByName(authentication.getName()).getId();
 
-		return companyService.getCompanyById(((User) session.getAttribute("user")).getId());
+	}
+
+	@RequestMapping(path = "details")
+	public Company getCompanyDetails() throws ObjectNotFoundException {
+
+		return companyService.getCompanyById(currentCompanyId());
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	public List<Coupon> getAllCoupons() {
 
-		return companyService.getAllCoupons(((User) session.getAttribute("user")).getId());
+		return companyService.getAllCoupons(currentCompanyId());
 	}
 
 	@PostMapping(path = "createcoupon")
 	public Coupon createNewCoupon(@RequestBody Coupon coupon) throws CouponDateException {
-		companyService.createCoupon(coupon, ((User) session.getAttribute("user")).getId());
+		companyService.createCoupon(coupon, currentCompanyId());
 		return coupon;
 	}
 
 	@RequestMapping(path = "coupon/{couponId}")
 	public Coupon getCouponById(@PathVariable long couponId) throws ObjectNotFoundException, PermissionException {
-		return companyService.getCouponById(couponId, ((User) session.getAttribute("user")).getId());
+		return companyService.getCouponById(couponId, currentCompanyId());
 	}
 
 	@PutMapping(path = "updatecoupon/{couponId}")
@@ -64,31 +82,32 @@ public class CompanyWebService {
 			throws PermissionException, ObjectNotFoundException, CouponDateException {
 		coupon.setId(couponId);
 
-		companyService.updateCoupon(coupon, ((User) session.getAttribute("user")).getId());
+		companyService.updateCoupon(coupon, currentCompanyId());
 	}
 
 	@DeleteMapping(path = "removecoupon/{couponId}")
 	public void removeCoupon(@PathVariable long couponId) throws ObjectNotFoundException, PermissionException {
-		companyService.removeCoupon(couponId, ((User) session.getAttribute("user")).getId());
+		companyService.removeCoupon(couponId, currentCompanyId());
 	}
 
 	@RequestMapping(path = "byPrice/{price}")
 	public List<Coupon> getCouponsLessThanPrice(@PathVariable double price) {
-		return companyService.getCouponsLessThanPrice(price, ((User) session.getAttribute("user")).getId());
+		return companyService.getCouponsLessThanPrice(price, currentCompanyId());
 	}
 
 	@RequestMapping(path = "beforeDate/{endDate}")
 	public List<Coupon> getCouponsBeforeDate(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-		return companyService.getCouponsBeforeDate(endDate, ((User) session.getAttribute("user")).getId());
+		return companyService.getCouponsBeforeDate(endDate, currentCompanyId());
 	}
 
 	@RequestMapping(path = "category/{category}")
 	public List<Coupon> getCouponsByCategory(@PathVariable CouponCategory category) {
-		return companyService.getCouponsByCategory(category, ((User) session.getAttribute("user")).getId());
+		return companyService.getCouponsByCategory(category, currentCompanyId());
 	}
 
+	@RequestMapping(path = "logout")
 	public void logout() {
-		session.invalidate();
+		// authenticationFacade.getAuthentication().setAuthenticated(false);
 	}
 
 }

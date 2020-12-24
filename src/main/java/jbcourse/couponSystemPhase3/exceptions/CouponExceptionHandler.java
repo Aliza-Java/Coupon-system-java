@@ -73,8 +73,8 @@ public class CouponExceptionHandler {
 
 	@ExceptionHandler(PermissionException.class)
 	public ResponseEntity<Object> handlePermissionException(PermissionException e) {
-		ApiError apiError = new ApiError("FORBIDDEN_ERROR", e.getMessage());
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.FORBIDDEN);
+		ApiError apiError = new ApiError("UNAUTHORIZED_ERROR", e.getMessage());
+		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
 	}
 
 	@ExceptionHandler(NoCouponsLeftException.class)

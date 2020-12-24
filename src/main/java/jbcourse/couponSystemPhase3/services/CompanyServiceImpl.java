@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -31,11 +32,12 @@ public class CompanyServiceImpl implements CompanyService {
 	@Autowired
 	CouponRepository couponRepository;
 
-	@Override
-	public Company login(String username, String password) {
+			@Override
+	public Company loadCompanyByUsernameAndPw(String username, String password) throws UsernameNotFoundException {
+
 		Optional<Company> optionalCompany = companyRepository.getCompanyByNameAndPassword(username, password);
 		if (!optionalCompany.isPresent()) {
-			return null;
+			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
 		return optionalCompany.get();
 	}
@@ -46,7 +48,23 @@ public class CompanyServiceImpl implements CompanyService {
 			return null;
 		}
 		return optionalCompany.get();
+	}
 
+//	public UserDetails getCompanyUserDetails(long companyId) throws ObjectNotFoundException {
+//		Company company = getCompanyById(companyId);
+//		if (company != null) {
+//			return new User(company.getName(), company.getPassword(), new ArrayList<>());
+//		} else {
+//			throw new ObjectNotFoundException("company", companyId);
+//		}
+//	}
+
+	public Company getCompanyByName(String name) {
+		Optional<Company> optionalCompany = companyRepository.findByName(name);
+		if (!optionalCompany.isPresent()) {
+			return null;
+		}
+		return optionalCompany.get();
 	}
 
 	@Override
@@ -78,16 +96,17 @@ public class CompanyServiceImpl implements CompanyService {
 	@Override
 	public void updateCoupon(Coupon updatedCoupon, long companyId)
 			throws PermissionException, ObjectNotFoundException, CouponDateException {
-		
+
 		/*
-		 * 	Incoming coupon does not register company although it is sent from client. 
-		 *  Here we retrieve the coupon from the database to check its company for permission reasons.
+		 * Incoming coupon does not register company although it is sent from client.
+		 * Here we retrieve the coupon from the database to check its company for
+		 * permission reasons.
 		 */
-		
+
 		Coupon retrievedCoupon = getCouponById(updatedCoupon.getId(), companyId);
 		Company verifiedCompany = retrievedCoupon.getCompany();
 		checkCompanyPermission(verifiedCompany.getId(), companyId);
-		
+
 		if (couponRepository.findById(updatedCoupon.getId()) == null) {
 			throw new ObjectNotFoundException("Coupon", updatedCoupon.getId());
 		}
