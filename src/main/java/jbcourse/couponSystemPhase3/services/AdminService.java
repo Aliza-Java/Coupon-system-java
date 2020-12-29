@@ -35,6 +35,8 @@ public interface AdminService {
 
 	public boolean removeCustomer(long id) throws ObjectNotFoundException;
 
+	public void removeCouponFromCustomers(long couponId);
+
 	public Customer getCustomerById(long id) throws ObjectNotFoundException;
 
 	public List<Customer> getAllCustomers();

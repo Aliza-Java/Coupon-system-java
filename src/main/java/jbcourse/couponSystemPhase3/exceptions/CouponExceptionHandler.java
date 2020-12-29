@@ -7,35 +7,48 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.ConversionFailedException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import jbcourse.couponSystemPhase3.CORSFilter;
+
 @ControllerAdvice
 public class CouponExceptionHandler {
 
+	/*
+	 * Originally all methods ended with including a new headers variable - changing
+	 * that to allow cors in. return new ResponseEntity<Object>(apiError, new
+	 * HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+	 */
+
+	private final Logger log = LoggerFactory.getLogger(CORSFilter.class);
+
+
 	// Catch-All
-	@ExceptionHandler(Throwable.class)
+	//@ExceptionHandler(Throwable.class)
 	public ResponseEntity<Object> handleThrowable(Throwable e) {
+		log.info(e.getMessage());
 		ApiError apiError = new ApiError("SERVER_ERROR",
 				"We are sorry, but something wrong happened. Please contact the admin.");
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<Object>(apiError,  HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@ExceptionHandler(CouponSystemException.class)
 	public ResponseEntity<Object> handleCouponSystemException(CouponSystemException e) {
 		ApiError apiError = new ApiError("COUPON_SYSTEM_ERROR", e.getMessage());
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+		return new ResponseEntity<Object>(apiError,  HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(ObjectNotFoundException.class)
 	public ResponseEntity<Object> handleObjectNotFoundException(ObjectNotFoundException e) {
 		ApiError apiError = new ApiError("OBJECT_NOT_FOUND_ERROR", e.getMessage());
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.NOT_FOUND);
+		return new ResponseEntity<Object>(apiError,  HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(ConversionFailedException.class)
@@ -44,7 +57,7 @@ public class CouponExceptionHandler {
 		// will work for other instances when the input does not match and there is a
 		// conversion failed error.
 		ApiError apiError = new ApiError("BAD_REQUEST", e.getValue() + " is not an acceptable value in this case.");
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<Object>(apiError,  HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)
@@ -61,38 +74,38 @@ public class CouponExceptionHandler {
 			validationErrorMessages.add(message);
 		}
 
-		return new ResponseEntity<Object>(new WebApiError("Input is invalid", validationErrorMessages),
+		return new ResponseEntity<Object>(new WebApiError("Input is invalid", validationErrorMessages), 
 				HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(LoginException.class)
 	public ResponseEntity<Object> handleLoginException(LoginException e) {
 		ApiError apiError = new ApiError("FORBIDDEN_ERROR", e.getMessage());
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.FORBIDDEN);
+		return new ResponseEntity<Object>(apiError,  HttpStatus.FORBIDDEN);
 	}
 
 	@ExceptionHandler(PermissionException.class)
 	public ResponseEntity<Object> handlePermissionException(PermissionException e) {
 		ApiError apiError = new ApiError("UNAUTHORIZED_ERROR", e.getMessage());
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<Object>(apiError,  HttpStatus.UNAUTHORIZED);
 	}
 
 	@ExceptionHandler(NoCouponsLeftException.class)
 	public ResponseEntity<Object> handleNoCouponsLeftException(NoCouponsLeftException e) {
 		ApiError apiError = new ApiError("CONFLICT_ERROR", e.getMessage());
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+		return new ResponseEntity<Object>(apiError,  HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(CouponAlreadyPurchasedException.class)
 	public ResponseEntity<Object> handleCouponAlreadyPurchased(CouponAlreadyPurchasedException e) {
 		ApiError apiError = new ApiError("CONFLICT_ERROR", e.getMessage());
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+		return new ResponseEntity<Object>(apiError,HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(CouponDateException.class)
 	public ResponseEntity<Object> handleCouponDateException(CouponDateException e) {
 		ApiError apiError = new ApiError("BAD_REQUEST", e.getMessage());
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<Object>(apiError,  HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
@@ -105,13 +118,13 @@ public class CouponExceptionHandler {
 		ApiError apiError = e.getMessage().contains("Cannot deserialize value of type `java.time.LocalDate`")
 				? new ApiError("BAD_REQUEST", "The dates you entered are not formatted correctly... try yyyy-mm-dd.")
 				: new ApiError("BAD_REQUEST", "The input caused an error.");
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<Object>(apiError,  HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(IncompatibleInputException.class)
 	public ResponseEntity<Object> handleDuplicateNames(IncompatibleInputException e) {
 		ApiError apiError = new ApiError("CONFLICT", e.getMessage());
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
+		return new ResponseEntity<Object>(apiError,  HttpStatus.CONFLICT);
 	}
 
 }

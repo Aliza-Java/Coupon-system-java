@@ -8,10 +8,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-
-import jbcourse.couponSystemPhase3.authentication.IAuthenticationFacade;
 import jbcourse.couponSystemPhase3.entities.Company;
 import jbcourse.couponSystemPhase3.entities.Coupon;
 import jbcourse.couponSystemPhase3.exceptions.CouponDateException;
@@ -21,32 +17,34 @@ import jbcourse.couponSystemPhase3.exceptions.PermissionException;
 import jbcourse.couponSystemPhase3.util_classes.CouponCategory;
 
 public interface CompanyService {
-	
 
 	public Coupon createCoupon(@Valid Coupon coupon, long companyId) throws CouponDateException;
-	
-	public void updateCoupon(@NotNull(message="Updated coupon cannot be null. ") @Valid Coupon coupon, long companyId) throws PermissionException, ObjectNotFoundException, CouponDateException;
 
-	public void removeCoupon (long couponId, long companyId) throws ObjectNotFoundException, PermissionException;
-		
+	public void updateCoupon(@NotNull(message = "Updated coupon cannot be null. ") @Valid Coupon coupon, long companyId)
+			throws PermissionException, ObjectNotFoundException, CouponDateException;
+
+	public void removeCoupon(long couponId, long companyId) throws ObjectNotFoundException, PermissionException;
+
 	public Coupon getCouponById(long couponId, long companyId) throws ObjectNotFoundException, PermissionException;
 
+	public Coupon checkIfExists(long couponId) throws ObjectNotFoundException;
+
 	public Company getCompanyByName(String username);
-	
-	public List<Coupon> getAllCoupons(long companyId);
-	
+
+	public List<Coupon> getCompanyCoupons(long companyId);
+
 	public List<Coupon> getCouponsLessThanPrice(@Positive double price, long companyId);
-	
+
 	public List<Coupon> getCouponsBeforeDate(LocalDate date, long companyId);
-	
+
 	public List<Coupon> getCouponsByCategory(CouponCategory category, long companyId);
 
-	public Company loadCompanyByUsernameAndPw(@NotNull @NotBlank String username, @NotNull @NotBlank String password) throws LoginException;
+	public Company loadCompanyByUsernameAndPw(@NotNull @NotBlank String username, @NotNull @NotBlank String password)
+			throws LoginException;
 
 	public Company getCompanyById(long id);
-	
-	//public UserDetails getCompanyUserDetails(long companyId) throws ObjectNotFoundException;
 
-
+	// public UserDetails getCompanyUserDetails(long companyId) throws
+	// ObjectNotFoundException;
 
 }

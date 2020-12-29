@@ -2,7 +2,6 @@ package jbcourse.couponSystemPhase3.entities;
 
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,7 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.validation.Valid;
 import javax.validation.constraints.Future;
@@ -78,15 +76,8 @@ public class Coupon {
 	@Valid
 	Company company;
 
-	@ManyToMany(mappedBy = "coupons", fetch = FetchType.EAGER)
-	@JsonIgnore
-	@Valid
-	List<Customer> customers;
-
-	
-
 	public Coupon(long id, String title, LocalDate startDate, LocalDate endDate, int amount, CouponCategory category,
-			String message, double price, String image, Company company) throws CouponDateException {
+			String message, double price, String image) throws CouponDateException {
 		super();
 		this.id = id;
 		this.title = title;
@@ -97,7 +88,6 @@ public class Coupon {
 		this.message = message;
 		this.price = price;
 		this.image = image;
-		this.company = company;
 	}
 
 	// a helper method to sort coupons when retrieved by a simple getter (not

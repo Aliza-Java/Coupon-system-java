@@ -23,6 +23,7 @@ import jbcourse.couponSystemPhase3.entities.Coupon;
 import jbcourse.couponSystemPhase3.exceptions.CouponDateException;
 import jbcourse.couponSystemPhase3.exceptions.ObjectNotFoundException;
 import jbcourse.couponSystemPhase3.exceptions.PermissionException;
+import jbcourse.couponSystemPhase3.services.AdminService;
 import jbcourse.couponSystemPhase3.services.CompanyService;
 import jbcourse.couponSystemPhase3.util_classes.CouponCategory;
 
@@ -33,6 +34,9 @@ public class CompanyWebService {
 
 	@Autowired
 	CompanyService companyService;
+	
+	@Autowired
+	AdminService adminService; //when deleting a coupon, it is necessary to delete it from customers first.
 
 //	@Autowired
 //	HttpSession session;
@@ -62,8 +66,7 @@ public class CompanyWebService {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public List<Coupon> getAllCoupons() {
-
-		return companyService.getAllCoupons(currentCompanyId());
+		return companyService.getCompanyCoupons(currentCompanyId());
 	}
 
 	@PostMapping(path = "createcoupon")
@@ -87,6 +90,7 @@ public class CompanyWebService {
 
 	@DeleteMapping(path = "removecoupon/{couponId}")
 	public void removeCoupon(@PathVariable long couponId) throws ObjectNotFoundException, PermissionException {
+		adminService.removeCouponFromCustomers(couponId);
 		companyService.removeCoupon(couponId, currentCompanyId());
 	}
 

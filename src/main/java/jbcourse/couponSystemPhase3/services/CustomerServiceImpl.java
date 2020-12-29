@@ -101,7 +101,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public List<Coupon> getAvailableCoupons(long customerId) throws ObjectNotFoundException {
-		List<Coupon> allCoupons = couponRepository.findAllByOrderByIdAsc();
+		List<Coupon> allCoupons = couponRepository.findAll();
 		List<Coupon> customerCoupons = getCustomerCoupons(customerId);
 
 		List<Coupon> availableCoupons = new ArrayList<>();

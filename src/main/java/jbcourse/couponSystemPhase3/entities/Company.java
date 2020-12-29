@@ -1,14 +1,9 @@
 package jbcourse.couponSystemPhase3.entities;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -43,10 +38,6 @@ public class Company {
 	@Email(message = "Email address is not valid.")
 	private String email;
 
-	@OneToMany(mappedBy = "company", cascade = { CascadeType.REMOVE, CascadeType.MERGE })
-	@Valid
-	List<Coupon> coupons;
-
 	public Company(String name, String password, String email) {
 		super();
 		this.name = name;
@@ -54,10 +45,6 @@ public class Company {
 		this.email = email;
 	}
 
-	@Override
-	public String toString() {
-		return "Company [id=" + id + ", name=" + name + ", password=" + password + ", email=" + email + ", coupons="
-				+ coupons + "]";
-	}
+
 
 }

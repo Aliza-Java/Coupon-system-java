@@ -20,6 +20,7 @@ import jbcourse.couponSystemPhase3.exceptions.ObjectNotFoundException;
 import jbcourse.couponSystemPhase3.exceptions.PermissionException;
 import jbcourse.couponSystemPhase3.repositories.CompanyRepository;
 import jbcourse.couponSystemPhase3.repositories.CouponRepository;
+import jbcourse.couponSystemPhase3.repositories.CustomerRepository;
 import jbcourse.couponSystemPhase3.util_classes.CouponCategory;
 
 @Validated
@@ -32,7 +33,10 @@ public class CompanyServiceImpl implements CompanyService {
 	@Autowired
 	CouponRepository couponRepository;
 
-			@Override
+	@Autowired
+	CustomerRepository customerRepository;
+	
+	@Override
 	public Company loadCompanyByUsernameAndPw(String username, String password) throws UsernameNotFoundException {
 
 		Optional<Company> optionalCompany = companyRepository.getCompanyByNameAndPassword(username, password);
@@ -68,13 +72,13 @@ public class CompanyServiceImpl implements CompanyService {
 	}
 
 	@Override
-	public List<Coupon> getAllCoupons(long companyId) {
-		return couponRepository.findAllByCompanyIdOrderByIdAsc(companyId);
+	public List<Coupon> getCompanyCoupons(long companyId) {
+		return couponRepository.findByCompanyId(companyId);
 	}
 
 	@Override
 	public Coupon createCoupon(Coupon coupon, long companyId) throws CouponDateException {
-		Company company = companyRepository.getOne(companyId); // find company Id to put into coupon
+		Company company = getCompanyById(companyId); // checking if exists and won't throw exception
 		validateCouponDates(coupon.getStartDate(), coupon.getEndDate());
 		coupon.setCompany(company);
 		couponRepository.save(coupon);
@@ -83,12 +87,18 @@ public class CompanyServiceImpl implements CompanyService {
 
 	@Override
 	public Coupon getCouponById(long couponId, long companyId) throws ObjectNotFoundException, PermissionException {
+		Coupon coupon = checkIfExists(couponId);
+		if (coupon != null) {
+			checkCompanyPermission(couponId, companyId);
+		}
+		return coupon;
+	}
 
+	@Override
+	public Coupon checkIfExists(long couponId) throws ObjectNotFoundException {
 		Optional<Coupon> optionalCoupon = couponRepository.findById(couponId);
 		if (!optionalCoupon.isPresent()) {
 			throw new ObjectNotFoundException("Coupon", couponId);
-		} else {
-			checkCompanyPermission(optionalCoupon.get().getCompany().getId(), companyId);
 		}
 		return optionalCoupon.get();
 	}
@@ -102,17 +112,9 @@ public class CompanyServiceImpl implements CompanyService {
 		 * Here we retrieve the coupon from the database to check its company for
 		 * permission reasons.
 		 */
-
-		Coupon retrievedCoupon = getCouponById(updatedCoupon.getId(), companyId);
-		Company verifiedCompany = retrievedCoupon.getCompany();
-		checkCompanyPermission(verifiedCompany.getId(), companyId);
-
-		if (couponRepository.findById(updatedCoupon.getId()) == null) {
-			throw new ObjectNotFoundException("Coupon", updatedCoupon.getId());
-		}
-
+		checkCompanyPermission(updatedCoupon.getId(), companyId);
+		checkIfExists(updatedCoupon.getId());
 		validateCouponDates(updatedCoupon.getStartDate(), updatedCoupon.getEndDate());
-		updatedCoupon.setCompany(verifiedCompany);
 		couponRepository.save(updatedCoupon);
 
 	}
@@ -121,10 +123,12 @@ public class CompanyServiceImpl implements CompanyService {
 	@Transactional
 	public void removeCoupon(long couponId, long companyId) throws ObjectNotFoundException, PermissionException {
 		try {
-			checkCompanyPermission(couponRepository.getOne(couponId).getCompany().getId(), companyId);
-
-			Coupon coupon = getCouponById(couponId, companyId);
-			couponRepository.save(coupon);
+			checkIfExists(couponId);
+			checkCompanyPermission(couponId, companyId);
+			
+			//need to remove from customers before deleting (otherwise get SQL exception)
+			
+			
 			couponRepository.deleteById(couponId);
 		} catch (EmptyResultDataAccessException | EntityNotFoundException e) {
 			throw new ObjectNotFoundException("Coupon", couponId);
@@ -133,25 +137,28 @@ public class CompanyServiceImpl implements CompanyService {
 
 	@Override
 	public List<Coupon> getCouponsLessThanPrice(double price, long companyId) {
-		return couponRepository.findAllByCompanyIdAndPriceLessThanEqualOrderByIdAsc(companyId, price);
+		return couponRepository.findAllByCompanyIdAndPriceLessThanEqualOrderById(companyId, price);
 	}
 
 	@Override
 	public List<Coupon> getCouponsBeforeDate(LocalDate endDate, long companyId) {
-		return couponRepository.findByCompanyIdAndEndDateLessThanEqualOrderByIdAsc(companyId, endDate);
+		return couponRepository.findByCompanyIdAndEndDateLessThanEqualOrderById(companyId, endDate);
 	}
 
 	@Override
 	public List<Coupon> getCouponsByCategory(CouponCategory category, long companyId) {
-		return couponRepository.findByCompanyIdAndCategoryOrderByIdAsc(companyId, category);
+		return couponRepository.findByCompanyIdAndCategoryOrderById(companyId, category);
 	}
 
-	private void checkCompanyPermission(long companyIdOfCoupon, long loggedCompanyId) throws PermissionException {
+	private boolean checkCompanyPermission(long couponId, long loggedCompanyId)
+			throws PermissionException, ObjectNotFoundException {
 		// Verifying that company actually owns this coupon and can touch only its
 		// coupons
-		if (companyIdOfCoupon != loggedCompanyId) {
-			throw new PermissionException("This coupon does not belong to your company.");
+		Coupon coupon = checkIfExists(couponId);
+		if (coupon.getCompany().getId() == loggedCompanyId) {
+			return true;
 		}
+		throw new PermissionException("This coupon does not belong to your company.");
 	}
 
 	// A helper method for updating coupon and creating new one.
@@ -161,5 +168,27 @@ public class CompanyServiceImpl implements CompanyService {
 		}
 
 	}
+
+//	// sort through a large batch of coupons and return only those that belong to a
+//	// specified company
+//	private List<Coupon> onlyCompanyCoupons(long companyId, List<Coupon> couponsToSort) {
+//		List<Coupon> neatCoupons = new ArrayList<Coupon>();
+//		for (Coupon c : couponsToSort) {
+//			if (foundInCompanysCoupons(c.getId(), companyId)) {
+//				neatCoupons.add(c);
+//			}
+//		}
+//		return neatCoupons;
+//	}
+
+	// check if a certain coupon belongs to a company
+//	private boolean foundInCompanysCoupons(long couponId, long companyId) {
+//		List<Coupon> companyCoupons = getCompanyCoupons(companyId);
+//		for (Coupon c : companyCoupons) {
+//			if (couponId == c.getId())
+//				return true;
+//		}
+//		return false;
+//	}
 
 }

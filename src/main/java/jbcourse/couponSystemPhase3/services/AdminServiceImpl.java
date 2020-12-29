@@ -19,6 +19,7 @@ import jbcourse.couponSystemPhase3.entities.Customer;
 import jbcourse.couponSystemPhase3.exceptions.IncompatibleInputException;
 import jbcourse.couponSystemPhase3.exceptions.ObjectNotFoundException;
 import jbcourse.couponSystemPhase3.repositories.CompanyRepository;
+import jbcourse.couponSystemPhase3.repositories.CouponRepository;
 import jbcourse.couponSystemPhase3.repositories.CustomerRepository;
 
 @Validated
@@ -31,6 +32,9 @@ public class AdminServiceImpl implements AdminService {
 	@Autowired
 	CustomerRepository customerRepository;
 
+	@Autowired
+	CouponRepository couponRepository;
+	
 	@Value("${spring.datasource.username}")
 	private String adminUsername;
 
@@ -49,9 +53,8 @@ public class AdminServiceImpl implements AdminService {
 
 	public UserDetails getAdminUserDetails(String username) throws UsernameNotFoundException {
 		if (adminUsername.equals(username)) {
-			//of course admin password is better encrypted.
-			return new User(adminUsername, adminPassword,
-					new ArrayList<>());
+			// of course admin password is better encrypted.
+			return new User(adminUsername, adminPassword, new ArrayList<>());
 		} else {
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
@@ -86,10 +89,8 @@ public class AdminServiceImpl implements AdminService {
 			throws IncompatibleInputException, ObjectNotFoundException {
 		// company cannot be null, as this was validated through spring validation in
 		// the method signature.
-		List<Coupon> saveTheCoupons; // Will be used to save the coupons as these are not updated
 		try {
 			Company existingCompany = getCompanyById(companyId);
-			saveTheCoupons = existingCompany.getCoupons();
 
 			// Checking if user is attempting to change company name
 			if (!existingCompany.getName().equals(companyUpdatedInfo.getName())) {
@@ -98,7 +99,6 @@ public class AdminServiceImpl implements AdminService {
 		} catch (ObjectNotFoundException e) {
 			throw new ObjectNotFoundException("Company", companyId);
 		}
-		companyUpdatedInfo.setCoupons(saveTheCoupons);
 		companyRepository.save(companyUpdatedInfo);
 
 	}
@@ -106,7 +106,19 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public boolean removeCompany(long id) throws ObjectNotFoundException {
 		try {
+			List<Coupon> companyCoupons = couponRepository.findAll(); //findByCompanyId not working for some reason
+			for (Coupon c : companyCoupons) {
+				if(c.getCompany().getId()==id)
+				couponRepository.deleteById(c.getId());
+			}
+			
+			//didn't seem to work
+			//couponRepository.deleteAll(companyCoupons);
+			
+			//coupons can't be deleted if there is no existing company associated with them. company is deleted last. 
 			companyRepository.deleteById(id);
+			
+			
 		} catch (EmptyResultDataAccessException e) {
 			throw new ObjectNotFoundException("Company", id);
 		}
@@ -165,6 +177,22 @@ public class AdminServiceImpl implements AdminService {
 			throw new ObjectNotFoundException("Customer", id);
 		}
 		return true;
+	}
+	
+	public void removeCouponFromCustomers(long couponId) {
+		List<Customer> allCustomers = getAllCustomers();
+		for (Customer customer : allCustomers) {
+			List<Coupon> coupons = customer.getCoupons();
+			for (Coupon c : coupons) {    //search in each customer's coupons
+				if(c.getId()==couponId) { //if found, resave customer's coupons without this coupon
+					coupons.remove(c);
+					customer.setCoupons(coupons);
+					customerRepository.save(customer);
+				}
+				
+			}
+		}
+		
 	}
 
 	private boolean isThisCompanyNameInUse(String suggestedCompanyName) {

@@ -19,7 +19,7 @@ public class UtilService {
 	//Regularly remove expired coupons.
 	@Scheduled(fixedRateString = "${coupon.deletion.rate}")
 	public void removeExpiredCoupons() {
-		List<Coupon> expiredCoupons = couponRepository.findByEndDateBeforeOrderByIdAsc(LocalDate.now());
+		List<Coupon> expiredCoupons = couponRepository.findByEndDateBeforeOrderById(LocalDate.now());
 		for(Coupon c:expiredCoupons) {
 			couponRepository.delete(c);
 		}
