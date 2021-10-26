@@ -111,5 +111,4 @@ public class CompanyWebService {
 	public void logout() {
 		authenticationFacade.getAuthentication().setAuthenticated(false);
 	}
-
 }

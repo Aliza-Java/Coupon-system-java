@@ -66,11 +66,6 @@ public class User implements UserDetails {
 		return false;
 	}
 
-	@Override
-	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -78,6 +73,12 @@ public class User implements UserDetails {
 	authorities.add(new SimpleGrantedAuthority(this.type.toString()));
 	return authorities;
 	
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
