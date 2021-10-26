@@ -34,6 +34,9 @@ public class JwtTokenUtil implements Serializable {
 	@Value("${jwt.expiration.ms}")
 	private int jwtExpiration;
 
+	JwtTokenUtil(){
+	}
+	
 	// retrieve username from jwt token
 	public long getIdFromToken(String token) {
 		try {

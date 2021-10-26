@@ -15,7 +15,7 @@ import jbcourse.couponSystemPhase3.util_classes.User;
  * An aspect disallowing company/customer to touch methods that are not of their user.
  */
 
-
+//Currently not relevant since we are not using sessions.
 @Aspect
 @Configuration
 public class PermissionAspect {

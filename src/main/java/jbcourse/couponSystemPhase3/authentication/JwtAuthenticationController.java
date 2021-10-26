@@ -28,7 +28,6 @@ public class JwtAuthenticationController {
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody Login loginRequest) throws Exception {
-
 		Authentication authentication = authenticate(loginRequest);
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -39,7 +38,6 @@ public class JwtAuthenticationController {
 	}
 
 	private Authentication authenticate(Login loginDetails) throws Exception {
-
 		Authentication authentication = null;
 		try {
 			authentication = authenticationManager.authenticate(
