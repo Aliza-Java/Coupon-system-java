@@ -7,12 +7,12 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-//@Order(1)
-//@WebFilter("/sec/*") 
+@WebFilter("/sec/*") 
 public class LoginFilter implements Filter {
 
 
@@ -30,15 +30,11 @@ public class LoginFilter implements Filter {
 			httpResponse.sendError(401, "You are not logged in.");
 		} 
 		
-		//Cors headers giving some problems.  Ensuring they are attached. 
-
 		httpResponse.setHeader("Access-Control-Allow-Origin", httpRequest.getHeader("Origin"));
 		httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
 		httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
 		httpResponse.setHeader("Access-Control-Max-Age", "3600");
 		httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me");
 			chain.doFilter(httpRequest, httpResponse);
-
 	}
-
 }

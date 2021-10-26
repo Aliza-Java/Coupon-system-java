@@ -26,5 +26,4 @@ public class ApiError {
 	public String toString() {
 		return "apiError [code=" + code + ", messages=" + messages + "]";
 	}
-
 }

@@ -44,7 +44,4 @@ public class Company {
 		this.password = password;
 		this.email = email;
 	}
-
-
-
 }

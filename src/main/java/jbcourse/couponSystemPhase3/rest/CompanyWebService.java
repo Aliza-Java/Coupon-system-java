@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +28,7 @@ import jbcourse.couponSystemPhase3.services.AdminService;
 import jbcourse.couponSystemPhase3.services.CompanyService;
 import jbcourse.couponSystemPhase3.util_classes.CouponCategory;
 
-//@CrossOrigin(origins = "${cors.origin}")
+@CrossOrigin(origins = "${cors.origin}")
 @RestController
 @RequestMapping("sec/company")
 public class CompanyWebService {
@@ -37,9 +38,6 @@ public class CompanyWebService {
 	
 	@Autowired
 	AdminService adminService; //when deleting a coupon, it is necessary to delete it from customers first.
-
-//	@Autowired
-//	HttpSession session;
 
 	@Autowired
 	IAuthenticationFacade authenticationFacade;
@@ -111,7 +109,7 @@ public class CompanyWebService {
 
 	@RequestMapping(path = "logout")
 	public void logout() {
-		// authenticationFacade.getAuthentication().setAuthenticated(false);
+		authenticationFacade.getAuthentication().setAuthenticated(false);
 	}
 
 }

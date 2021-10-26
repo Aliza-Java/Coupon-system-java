@@ -31,7 +31,7 @@ public class CouponExceptionHandler {
 
 
 	// Catch-All
-	//@ExceptionHandler(Throwable.class)
+	@ExceptionHandler(Throwable.class)
 	public ResponseEntity<Object> handleThrowable(Throwable e) {
 		log.info(e.getMessage());
 		ApiError apiError = new ApiError("SERVER_ERROR",
@@ -126,5 +126,4 @@ public class CouponExceptionHandler {
 		ApiError apiError = new ApiError("CONFLICT", e.getMessage());
 		return new ResponseEntity<Object>(apiError,  HttpStatus.CONFLICT);
 	}
-
 }

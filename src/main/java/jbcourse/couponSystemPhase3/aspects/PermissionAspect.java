@@ -16,7 +16,7 @@ import jbcourse.couponSystemPhase3.util_classes.User;
  */
 
 
-//@Aspect
+@Aspect
 @Configuration
 public class PermissionAspect {
 	
@@ -39,5 +39,4 @@ public class PermissionAspect {
 			throw new PermissionException("Only customers can access this function.");
 		}
 	}
-
 }
